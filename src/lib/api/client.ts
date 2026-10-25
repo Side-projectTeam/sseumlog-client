@@ -1,7 +1,14 @@
-import axios, { type AxiosError } from "axios";
+import axios, { isAxiosError } from "axios";
 
+export type ApiResponse<T> = {
+  success: boolean;
+  code: string;
+  message: string;
+  data: T;
+};
+
+// 같은 origin의 /api/* 로 요청하고, next.config.ts의 rewrites가 백엔드로 전달한다.
 export const apiClient = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL,
   timeout: 10_000,
   headers: { "Content-Type": "application/json" },
 });
@@ -11,10 +18,10 @@ apiClient.interceptors.request.use((config) => {
   return config;
 });
 
-apiClient.interceptors.response.use(
-  (response) => response,
-  (error: AxiosError) => {
-    // 401 처리, 토큰 갱신 등 공통 에러 처리는 여기서 한다.
-    return Promise.reject(error);
-  },
-);
+export function getApiErrorMessage(error: unknown, fallback = "잠시 후 다시 시도해 주세요.") {
+  if (isAxiosError<ApiResponse<unknown>>(error)) {
+    return error.response?.data?.message ?? fallback;
+  }
+  if (error instanceof Error) return error.message;
+  return fallback;
+}

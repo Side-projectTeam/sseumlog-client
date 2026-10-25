@@ -2,18 +2,19 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 
-import { ChevronDownIcon, ChevronLeftIcon } from "@/components/icons/chevron-icons";
 import { sendEmailCode, signup, verifyEmailCode } from "@/features/auth/api";
 import { signupSchema, type SignupForm as SignupFormValues } from "@/features/auth/schemas";
 import { formatCountdown, useCountdown } from "@/hooks/use-countdown";
 import { getApiErrorMessage } from "@/lib/api/client";
 import { cn } from "@/lib/cn";
 
+import { AuthHeader } from "../../_components/auth-header";
+import { PhoneField } from "../../_components/phone-field";
+import { PrimaryButton } from "../../_components/primary-button";
 import { TextField } from "../../_components/text-field";
 
 const CODE_TTL_SECONDS = 180;
@@ -80,23 +81,11 @@ export function SignupForm() {
 
   return (
     <>
-      <header className="flex h-[60px] items-center">
-        {step === "account" ? (
-          <Link href="/login" aria-label="뒤로 가기" className="-ml-1 p-1">
-            <ChevronLeftIcon className="size-5" />
-          </Link>
-        ) : (
-          <button
-            type="button"
-            aria-label="뒤로 가기"
-            onClick={() => setStep("account")}
-            className="-ml-1 p-1"
-          >
-            <ChevronLeftIcon className="size-5" />
-          </button>
-        )}
-        <h1 className="ml-2 text-base font-semibold">회원가입</h1>
-      </header>
+      {step === "account" ? (
+        <AuthHeader title="회원가입" backHref="/login" />
+      ) : (
+        <AuthHeader title="회원가입" onBack={() => setStep("account")} />
+      )}
 
       <form onSubmit={onComplete} noValidate className="mt-10 flex flex-col">
         {step === "account" ? (
@@ -123,9 +112,9 @@ export function SignupForm() {
                 {...register("password")}
               />
             </div>
-            <SubmitButton type="button" onClick={goToProfile} className="mt-[30px]">
+            <PrimaryButton type="button" onClick={goToProfile} className="mt-[30px]">
               다음
-            </SubmitButton>
+            </PrimaryButton>
           </>
         ) : (
           <>
@@ -139,41 +128,12 @@ export function SignupForm() {
                 {...register("name")}
               />
 
-              <div className="flex flex-col gap-2">
-                <label htmlFor="phoneNumber" className="text-[15px] font-medium">
-                  휴대폰 번호
-                </label>
-                <div className="flex gap-3">
-                  <div className="relative">
-                    {/* 서버가 010 번호만 받으므로 국가 코드는 +82 하나만 둔다 */}
-                    <select
-                      aria-label="국가 코드"
-                      defaultValue="+82"
-                      className="h-[50px] w-[90px] appearance-none rounded-lg bg-field pr-9 pl-[15px] text-[15px] ring-primary outline-none focus:ring-2"
-                    >
-                      <option value="+82">+82</option>
-                    </select>
-                    <ChevronDownIcon className="pointer-events-none absolute top-1/2 right-[13px] size-4 -translate-y-1/2" />
-                  </div>
-                  <input
-                    id="phoneNumber"
-                    type="tel"
-                    inputMode="numeric"
-                    autoComplete="tel-national"
-                    placeholder="01012345678"
-                    maxLength={11}
-                    aria-invalid={!!errors.phoneNumber}
-                    aria-describedby={errors.phoneNumber ? "phoneNumber-message" : undefined}
-                    className="h-[50px] min-w-0 flex-1 rounded-lg bg-field px-[15px] text-[15px] ring-primary transition-shadow outline-none placeholder:text-[#c4c4c4] focus:ring-2 aria-invalid:ring-2 aria-invalid:ring-danger"
-                    {...register("phoneNumber")}
-                  />
-                </div>
-                {errors.phoneNumber && (
-                  <p id="phoneNumber-message" className="text-xs text-danger">
-                    {errors.phoneNumber.message}
-                  </p>
-                )}
-              </div>
+              <PhoneField
+                id="phoneNumber"
+                label="휴대폰 번호"
+                error={errors.phoneNumber?.message}
+                {...register("phoneNumber")}
+              />
 
               {codeSent && (
                 <div className="flex flex-col gap-2">
@@ -226,38 +186,26 @@ export function SignupForm() {
             )}
 
             {codeSent ? (
-              <SubmitButton
+              <PrimaryButton
                 type="submit"
                 disabled={completeMutation.isPending}
                 className="mt-[30px]"
               >
                 인증 완료
-              </SubmitButton>
+              </PrimaryButton>
             ) : (
-              <SubmitButton
+              <PrimaryButton
                 type="button"
                 onClick={requestCode}
                 disabled={sendCodeMutation.isPending}
                 className="mt-[30px]"
               >
                 인증 하기
-              </SubmitButton>
+              </PrimaryButton>
             )}
           </>
         )}
       </form>
     </>
-  );
-}
-
-function SubmitButton({ className, ...props }: React.ComponentProps<"button">) {
-  return (
-    <button
-      className={cn(
-        "h-[50px] rounded-lg bg-primary text-base font-semibold text-white transition-opacity disabled:opacity-60",
-        className,
-      )}
-      {...props}
-    />
   );
 }

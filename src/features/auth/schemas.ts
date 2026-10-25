@@ -12,6 +12,10 @@ const password = z
     "영문, 숫자, 특수문자(!@#$%^&*)를 모두 포함해 주세요.",
   );
 
+const phoneNumber = z
+  .string()
+  .regex(/^010[0-9]{8}$/, "010으로 시작하는 숫자 11자리를 입력해 주세요.");
+
 export const loginSchema = z.object({
   email: z.string().min(1, "이메일을 입력해 주세요.").pipe(email),
   password: z.string().min(1, "비밀번호를 입력해 주세요."),
@@ -25,8 +29,27 @@ export const signupSchema = z.object({
     .min(2, "이름은 2~10자로 입력해 주세요.")
     .max(10, "이름은 2~10자로 입력해 주세요.")
     .regex(/^[가-힣a-zA-Z ]+$/, "이름은 한글 또는 영문만 입력할 수 있어요."),
-  phoneNumber: z.string().regex(/^010[0-9]{8}$/, "010으로 시작하는 숫자 11자리를 입력해 주세요."),
+  phoneNumber,
 });
+
+export const findEmailSchema = z.object({ phoneNumber });
+
+export const findPasswordSchema = z.object({
+  email: z.string().min(1, "이메일을 입력해 주세요.").pipe(email),
+});
+
+export const resetPasswordSchema = z
+  .object({
+    newPassword: password,
+    newPasswordConfirm: z.string().min(1, "비밀번호를 한 번 더 입력해 주세요."),
+  })
+  .refine((v) => v.newPassword === v.newPasswordConfirm, {
+    path: ["newPasswordConfirm"],
+    message: "비밀번호가 일치하지 않아요.",
+  });
 
 export type LoginForm = z.infer<typeof loginSchema>;
 export type SignupForm = z.infer<typeof signupSchema>;
+export type FindEmailForm = z.infer<typeof findEmailSchema>;
+export type FindPasswordForm = z.infer<typeof findPasswordSchema>;
+export type ResetPasswordForm = z.infer<typeof resetPasswordSchema>;

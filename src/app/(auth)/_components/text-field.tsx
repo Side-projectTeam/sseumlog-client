@@ -3,7 +3,7 @@ import { type ComponentProps } from "react";
 import { cn } from "@/lib/cn";
 
 type Props = ComponentProps<"input"> & {
-  label: string;
+  label?: string;
   hint?: string;
   error?: string;
 };
@@ -14,9 +14,11 @@ export function TextField({ id, label, hint, error, className, ...props }: Props
 
   return (
     <div className="flex flex-col gap-2">
-      <label htmlFor={id} className="text-[15px] font-medium">
-        {label}
-      </label>
+      {label && (
+        <label htmlFor={id} className="text-[15px] font-medium">
+          {label}
+        </label>
+      )}
       <input
         id={id}
         aria-invalid={!!error}

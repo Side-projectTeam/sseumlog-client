@@ -9,6 +9,11 @@
   --color-kakao: #fee500;
   --color-danger: #f03e3e;
 
+  /* 홈 소비방 */
+  --color-room: #eaedfd;
+  --color-shelf: #e6e8fb;
+  --color-floor: #dfe2fa;
+
   --font-sans: var(--font-pretendard), system-ui, sans-serif;
 }
 

@@ -10,11 +10,13 @@ import { toYearMonth, useCurrentMonth } from "@/hooks/use-current-month";
 
 import { BudgetCard } from "./budget-card";
 import { CategoryShelves } from "./category-shelves";
+import { RecordSheets, type SheetRoute } from "./record/record-sheets";
 
 export function HomeScreen() {
   const currentMonth = useCurrentMonth();
   // 이번 달 기준 몇 달 전을 보고 있는지 (0 = 이번 달)
   const [monthsAgo, setMonthsAgo] = useState(0);
+  const [sheets, setSheets] = useState<SheetRoute[]>([]);
 
   const selected = currentMonth === null ? null : toYearMonth(currentMonth - monthsAgo);
 
@@ -69,7 +71,13 @@ export function HomeScreen() {
         <BudgetCard summary={data} isCurrentMonth={monthsAgo === 0} month={selected?.month} />
       </div>
 
-      <CategoryShelves categories={data?.categories ?? []} />
+      <CategoryShelves
+        categories={data?.categories ?? []}
+        onSelectCategory={(category) => setSheets([{ type: "list", category }])}
+        onAdd={() => setSheets([{ type: "decorate" }])}
+      />
+
+      <RecordSheets nickname={data?.nickname ?? ""} stack={sheets} onChange={setSheets} />
     </main>
   );
 }

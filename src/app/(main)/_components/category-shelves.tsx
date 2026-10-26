@@ -18,9 +18,11 @@ type Slot = { type: "category"; id: CategoryId } | { type: "empty"; preview: str
 
 type Props = {
   categories: CategoryId[];
+  onSelectCategory: (id: CategoryId) => void;
+  onAdd: () => void;
 };
 
-export function CategoryShelves({ categories }: Props) {
+export function CategoryShelves({ categories, onSelectCategory, onAdd }: Props) {
   let index = 0;
   let emptyIndex = 0;
   const shelves = SHELF_SLOTS.map((count) =>
@@ -36,7 +38,13 @@ export function CategoryShelves({ categories }: Props) {
     <section aria-label="소비 카테고리" className="relative flex flex-1 flex-col">
       <div className="flex flex-col gap-[30px] px-5 pt-[30px]">
         {shelves.map((slots, i) => (
-          <Shelf key={i} slots={slots} align={i === 0 ? "start" : "end"} />
+          <Shelf
+            key={i}
+            slots={slots}
+            align={i === 0 ? "start" : "end"}
+            onSelectCategory={onSelectCategory}
+            onAdd={onAdd}
+          />
         ))}
       </div>
 
@@ -45,7 +53,12 @@ export function CategoryShelves({ categories }: Props) {
   );
 }
 
-function Shelf({ slots, align }: { slots: Slot[]; align: "start" | "end" }) {
+function Shelf({
+  slots,
+  align,
+  onSelectCategory,
+  onAdd,
+}: { slots: Slot[]; align: "start" | "end" } & Pick<Props, "onSelectCategory" | "onAdd">) {
   return (
     <div className={cn("flex flex-col", align === "end" && "items-end")}>
       <ul className="relative z-[1] flex">
@@ -55,9 +68,9 @@ function Shelf({ slots, align }: { slots: Slot[]; align: "start" | "end" }) {
             className="flex h-[70px] w-[77px] items-end justify-center"
           >
             {slot.type === "category" ? (
-              <CategoryItem id={slot.id} />
+              <CategoryItem id={slot.id} onClick={() => onSelectCategory(slot.id)} />
             ) : (
-              <AddSlot preview={slot.preview} />
+              <AddSlot preview={slot.preview} onClick={onAdd} />
             )}
           </li>
         ))}
@@ -71,24 +84,28 @@ function Shelf({ slots, align }: { slots: Slot[]; align: "start" | "end" }) {
   );
 }
 
-function CategoryItem({ id }: { id: CategoryId }) {
+function CategoryItem({ id, onClick }: { id: CategoryId; onClick: () => void }) {
   const { name, image } = CATEGORIES[id];
 
   return (
-    // TODO: 카테고리 상세 화면이 생기면 연결
-    <button type="button" aria-label={name} className="flex h-[60px] items-end">
+    <button
+      type="button"
+      aria-label={`${name} 소비 기록 보기`}
+      onClick={onClick}
+      className="flex h-[60px] items-end"
+    >
       <Image src={image} width={106} height={92} alt="" className="max-h-full w-auto" />
     </button>
   );
 }
 
 // Figma: 64×64, 배경 #FFFFFF 10%, + 선 3px Brand/Purple/Primary
-function AddSlot({ preview }: { preview: string }) {
+function AddSlot({ preview, onClick }: { preview: string; onClick: () => void }) {
   return (
-    // TODO: 카테고리 추가 기능이 생기면 연결
     <button
       type="button"
-      aria-label="카테고리 추가"
+      aria-label="소비방 꾸미기"
+      onClick={onClick}
       className="relative mb-1 flex size-16 items-center justify-center overflow-hidden rounded-[14px] text-primary ring-1 ring-white/80 ring-inset"
     >
       <Image

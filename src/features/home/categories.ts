@@ -5,6 +5,6 @@ export const CATEGORIES: Record<CategoryId, { name: string; image: string }> = {
   food: { name: "식비", image: "/images/categories/food.png" },
   household: { name: "생활용품", image: "/images/categories/household.png" },
   cafe: { name: "카페·간식", image: "/images/categories/cafe.png" },
-  study: { name: "교육·문구", image: "/images/categories/study.png" },
+  study: { name: "책/문구류", image: "/images/categories/study.png" },
   hobby: { name: "취미·여가", image: "/images/categories/hobby.png" },
 };

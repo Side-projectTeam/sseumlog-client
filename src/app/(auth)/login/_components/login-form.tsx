@@ -3,11 +3,13 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 
 import { KakaoTalkIcon } from "@/components/icons/kakao-talk-icon";
 import { login } from "@/features/auth/api";
 import { loginSchema, type LoginForm as LoginFormValues } from "@/features/auth/schemas";
+import { useAuthStore } from "@/features/auth/store";
 import { getApiErrorMessage } from "@/lib/api/client";
 
 import { TextField } from "../../_components/text-field";
@@ -27,7 +29,16 @@ export function LoginForm() {
     defaultValues: { email: "", password: "" },
   });
 
-  const loginMutation = useMutation({ mutationFn: login });
+  const router = useRouter();
+  const setSession = useAuthStore((s) => s.setSession);
+
+  const loginMutation = useMutation({
+    mutationFn: login,
+    onSuccess: ({ data }) => {
+      setSession({ userId: data.userId, email: data.email, accessToken: data.accessToken });
+      router.replace("/");
+    },
+  });
 
   const onSubmit = handleSubmit((values) => loginMutation.mutate(values));
 

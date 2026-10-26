@@ -29,9 +29,16 @@ export async function signup(body: SignupForm) {
   return data;
 }
 
-// TODO: 서버에 로그인 API가 추가되면 연결
-export async function login(_body: LoginForm): Promise<never> {
-  throw new Error("로그인 API가 아직 준비되지 않았어요.");
+export type LoginResponse = {
+  userId: number;
+  email: string;
+  accessToken: string;
+  tokenType: string;
+};
+
+export async function login(body: LoginForm) {
+  const { data } = await apiClient.post<ApiResponse<LoginResponse>>("/api/auth/login", body);
+  return data;
 }
 
 export type FindEmailResponse = {
@@ -46,10 +53,12 @@ export async function findEmail(_body: FindEmailForm): Promise<ApiResponse<FindE
   throw new Error("이메일 찾기 API가 아직 준비되지 않았어요.");
 }
 
-// TODO: 서버에 비밀번호 재설정 API가 추가되면 연결. 이메일 인증(PASSWORD_REST)을 마친 뒤 호출한다고 가정한다.
-export async function resetPassword(_body: {
+// 이메일 인증(PASSWORD_REST)에 쓴 인증코드를 같이 보낸다.
+export async function resetPassword(body: {
   email: string;
+  verificationCode: string;
   newPassword: string;
-}): Promise<ApiResponse<null>> {
-  throw new Error("비밀번호 재설정 API가 아직 준비되지 않았어요.");
+}) {
+  const { data } = await apiClient.post<ApiResponse<null>>("/api/users/password/reset", body);
+  return data;
 }

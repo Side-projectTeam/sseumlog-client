@@ -28,6 +28,8 @@ export function FindPasswordFlow() {
   const router = useRouter();
   const [step, setStep] = useState<Step>("email");
   const [email, setEmail] = useState("");
+  // 비밀번호 재설정 요청에 인증코드를 같이 보내야 해서 들고 있는다.
+  const [verificationCode, setVerificationCode] = useState("");
 
   const sendCodeMutation = useMutation({
     mutationFn: (target: string) => sendEmailCode({ email: target, purpose: "PASSWORD_REST" }),
@@ -70,10 +72,19 @@ export function FindPasswordFlow() {
             email={email}
             resending={sendCodeMutation.isPending}
             onResend={() => sendCode(email)}
-            onVerified={() => setStep("reset")}
+            onVerified={(code) => {
+              setVerificationCode(code);
+              setStep("reset");
+            }}
           />
         )}
-        {step === "reset" && <ResetStep email={email} onDone={() => setStep("done")} />}
+        {step === "reset" && (
+          <ResetStep
+            email={email}
+            verificationCode={verificationCode}
+            onDone={() => setStep("done")}
+          />
+        )}
         {step === "done" && (
           <ResultCard
             title="비밀번호 재설정"
@@ -168,13 +179,13 @@ function VerifyStep({
   email: string;
   resending: boolean;
   onResend: () => void;
-  onVerified: () => void;
+  onVerified: (code: string) => void;
 }) {
   const [code, setCode] = useState("");
 
   const verifyMutation = useMutation({
     mutationFn: () => verifyEmailCode({ email, purpose: "PASSWORD_REST", code }),
-    onSuccess: onVerified,
+    onSuccess: () => onVerified(code),
   });
 
   const error = verifyMutation.isError ? getApiErrorMessage(verifyMutation.error) : undefined;
@@ -229,7 +240,15 @@ function VerifyStep({
   );
 }
 
-function ResetStep({ email, onDone }: { email: string; onDone: () => void }) {
+function ResetStep({
+  email,
+  verificationCode,
+  onDone,
+}: {
+  email: string;
+  verificationCode: string;
+  onDone: () => void;
+}) {
   const {
     register,
     handleSubmit,
@@ -244,7 +263,7 @@ function ResetStep({ email, onDone }: { email: string; onDone: () => void }) {
   return (
     <form
       onSubmit={handleSubmit((values) =>
-        resetMutation.mutate({ email, newPassword: values.newPassword }),
+        resetMutation.mutate({ email, verificationCode, newPassword: values.newPassword }),
       )}
       noValidate
       className="mt-5 flex flex-col"

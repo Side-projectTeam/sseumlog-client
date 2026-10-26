@@ -1,5 +1,7 @@
 import axios, { isAxiosError } from "axios";
 
+import { useAuthStore } from "@/features/auth/store";
+
 export type ApiResponse<T> = {
   success: boolean;
   code: string;
@@ -14,8 +16,24 @@ export const apiClient = axios.create({
 });
 
 apiClient.interceptors.request.use((config) => {
-  // 인증 토큰 등 공통 헤더는 여기서 붙인다.
+  const token = useAuthStore.getState().session?.accessToken;
+  if (token) config.headers.Authorization = `Bearer ${token}`;
   return config;
+});
+
+apiClient.interceptors.response.use(undefined, (error) => {
+  // 토큰을 보냈는데 401이면 만료된 것으로 보고 로그아웃시킨다.
+  // (로그인 실패도 401이라 토큰을 보낸 요청만 처리한다)
+  if (
+    isAxiosError(error) &&
+    error.response?.status === 401 &&
+    error.config?.headers.Authorization &&
+    typeof window !== "undefined"
+  ) {
+    useAuthStore.getState().clearSession();
+    window.location.replace("/login");
+  }
+  return Promise.reject(error);
 });
 
 export function getApiErrorMessage(error: unknown, fallback = "잠시 후 다시 시도해 주세요.") {

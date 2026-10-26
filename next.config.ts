@@ -15,6 +15,11 @@ const nextConfig: NextConfig = {
       },
     },
   },
+  // 백엔드에 CORS 설정이 없어서 같은 origin의 /api/* 로 받아 서버에서 전달한다.
+  async rewrites() {
+    if (!process.env.API_URL) return [];
+    return [{ source: "/api/:path*", destination: `${process.env.API_URL}/api/:path*` }];
+  },
   async headers() {
     return [
       {

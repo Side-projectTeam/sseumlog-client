@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation";
 import { ChartIcon, HomeIcon, UserIcon } from "@/components/icons/nav-icons";
 import { cn } from "@/lib/cn";
 
-// TODO: /spending, /my 화면이 생기면 연결
+// TODO: /spending, /my 는 시안이 나올 때까지 준비 중 화면
 const tabs = [
   { href: "/", label: "홈", Icon: HomeIcon },
   { href: "/spending", label: "소비", Icon: ChartIcon },

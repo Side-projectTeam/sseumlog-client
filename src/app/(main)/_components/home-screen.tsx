@@ -27,7 +27,7 @@ export function HomeScreen() {
   });
 
   return (
-    <main className="flex flex-1 flex-col">
+    <main className="flex flex-1 flex-col bg-room">
       <section className="bg-primary px-5 pt-[env(safe-area-inset-top)] pb-[79px] text-white">
         <header className="flex h-12 items-center justify-between">
           <div className="flex items-center gap-2.5">

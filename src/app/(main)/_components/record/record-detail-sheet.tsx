@@ -1,7 +1,5 @@
 "use client";
 
-import { useState } from "react";
-
 import { BottomSheet } from "@/components/ui/bottom-sheet";
 import { CATEGORIES } from "@/features/home/categories";
 import { emotionLabel, satisfactionLabel } from "@/features/record/options";
@@ -11,6 +9,7 @@ import { getApiErrorMessage } from "@/lib/api/client";
 import { cn } from "@/lib/cn";
 
 import { formatFullDate, formatPrice } from "./format";
+import { LikeButton } from "./like-button";
 import { RecordImage } from "./record-image";
 
 type Props = {
@@ -45,8 +44,6 @@ function RecordDetail({
   onEdit: () => void;
   onDeleted: () => void;
 }) {
-  // TODO: 좋아요 API가 생기면 연결
-  const [liked, setLiked] = useState(false);
   const deleteMutation = useDeleteRecord();
   const categoryName = CATEGORIES[record.category].name;
 
@@ -85,23 +82,7 @@ function RecordDetail({
             </svg>
             <span className="truncate">{record.place || "거래처 없음"}</span>
           </p>
-          <button
-            type="button"
-            aria-label={liked ? "좋아요 취소" : "좋아요"}
-            aria-pressed={liked}
-            onClick={() => setLiked((v) => !v)}
-            className="-mr-1 p-1"
-          >
-            <svg viewBox="0 0 24 24" aria-hidden className="size-5">
-              <path
-                d="M12 20s-7.5-4.6-7.5-10A4.3 4.3 0 0 1 12 7.4 4.3 4.3 0 0 1 19.5 10c0 5.4-7.5 10-7.5 10Z"
-                fill={liked ? "currentColor" : "none"}
-                stroke="currentColor"
-                strokeWidth="1.8"
-                strokeLinejoin="round"
-              />
-            </svg>
-          </button>
+          <LikeButton id={record.id} liked={record.liked} className="-mr-1 size-7" />
         </div>
       </div>
 

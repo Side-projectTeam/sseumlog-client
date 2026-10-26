@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-const categoryIds = ["food", "household", "cafe", "study", "hobby"] as const;
+import { CATEGORY_IDS } from "@/features/home/types";
 
 export const recordFormSchema = z.object({
   imageUrl: z.string().nullable(),
@@ -10,7 +10,7 @@ export const recordFormSchema = z.object({
     .min(1, "가격을 입력해 주세요.")
     .refine((v) => Number(v.replaceAll(",", "")) > 0, "0원보다 큰 금액을 입력해 주세요."),
   purchasedAt: z.string().min(1, "구매일을 선택해 주세요."),
-  category: z.enum(categoryIds, "카테고리를 선택해 주세요."),
+  category: z.enum(CATEGORY_IDS, "카테고리를 선택해 주세요."),
   satisfaction: z.enum(
     ["VERY_SATISFIED", "SATISFIED", "NORMAL", "DISAPPOINTED"],
     "만족도를 선택해 주세요.",

@@ -16,6 +16,7 @@ export type SpendingRecord = {
   emotion: Emotion;
   memo: string;
   place: string;
+  liked: boolean;
 };
 
-export type SpendingRecordInput = Omit<SpendingRecord, "id">;
+export type SpendingRecordInput = Omit<SpendingRecord, "id" | "liked">;

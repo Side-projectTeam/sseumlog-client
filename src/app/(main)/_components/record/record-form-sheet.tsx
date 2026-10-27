@@ -77,7 +77,7 @@ export function EditRecordSheet({ id, onDone, onClose }: EditProps) {
 }
 
 function toFormValues(record: SpendingRecord): RecordFormValues {
-  const { id: _id, price, ...rest } = record;
+  const { id: _id, liked: _liked, price, ...rest } = record;
   return { ...rest, price: price.toLocaleString("ko-KR") };
 }
 

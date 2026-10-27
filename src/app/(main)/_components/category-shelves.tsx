@@ -94,7 +94,14 @@ function CategoryItem({ id, onClick }: { id: CategoryId; onClick: () => void }) 
       onClick={onClick}
       className="flex h-[60px] items-end"
     >
-      <Image src={image} width={106} height={92} alt="" className="max-h-full w-auto" />
+      {image ? (
+        <Image src={image} width={106} height={92} alt="" className="max-h-full w-auto" />
+      ) : (
+        // TODO: 아이콘 에셋이 없는 카테고리는 이름으로 대신 보여준다
+        <span className="mb-1 flex size-14 items-center justify-center rounded-2xl bg-white/70 text-xs font-semibold text-primary shadow-sm">
+          {CATEGORIES[id].shortName}
+        </span>
+      )}
     </button>
   );
 }

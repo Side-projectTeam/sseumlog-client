@@ -1,6 +1,6 @@
 export function ComingSoon({ title }: { title: string }) {
   return (
-    <main className="flex flex-1 flex-col">
+    <main className="flex flex-1 flex-col bg-white">
       <header className="bg-primary px-5 pt-[env(safe-area-inset-top)] text-white">
         <h1 className="flex h-12 items-center text-xl font-bold">{title}</h1>
       </header>

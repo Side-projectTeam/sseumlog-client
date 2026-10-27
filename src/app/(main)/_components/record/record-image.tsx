@@ -25,7 +25,7 @@ export function RecordImage({ imageUrl, category, sizes, className }: Props) {
           unoptimized={imageUrl.startsWith("blob:")}
           className="object-cover"
         />
-      ) : (
+      ) : CATEGORIES[category].image ? (
         <Image
           src={CATEGORIES[category].image}
           alt=""
@@ -33,6 +33,10 @@ export function RecordImage({ imageUrl, category, sizes, className }: Props) {
           height={92}
           className="absolute top-1/2 left-1/2 h-1/2 w-auto -translate-x-1/2 -translate-y-1/2 object-contain"
         />
+      ) : (
+        <span className="absolute inset-0 flex items-center justify-center text-sm font-semibold text-primary/70">
+          {CATEGORIES[category].shortName}
+        </span>
       )}
     </div>
   );

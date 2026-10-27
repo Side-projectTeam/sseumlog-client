@@ -10,6 +10,8 @@ type Props = {
   /** primary: 보라색 헤더 (소비 기록 모아보기) */
   variant?: "default" | "primary";
   titleAlign?: "start" | "center";
+  /** 작은 제목 + 닫기(X) 없음 (정렬 선택 같은 목록 시트) */
+  compact?: boolean;
   onClose: () => void;
   children: ReactNode;
 };
@@ -19,6 +21,7 @@ export function BottomSheet({
   description,
   variant = "default",
   titleAlign = "start",
+  compact = false,
   onClose,
   children,
 }: Props) {
@@ -48,12 +51,13 @@ export function BottomSheet({
       >
         <header
           className={cn(
-            "relative shrink-0 px-5 pt-6 pb-4",
+            "relative shrink-0 px-5",
+            compact ? "pt-3 pb-1" : "pt-6 pb-4",
             variant === "primary" && "bg-primary text-white",
             titleAlign === "center" && "text-center",
           )}
         >
-          <h2 id={titleId} className="text-lg font-bold">
+          <h2 id={titleId} className={compact ? "text-[13px] font-medium" : "text-lg font-bold"}>
             {title}
           </h2>
           {description && (
@@ -66,24 +70,31 @@ export function BottomSheet({
               {description}
             </p>
           )}
-          <button
-            type="button"
-            aria-label="닫기"
-            onClick={onClose}
-            className="absolute top-6 right-4 p-1"
-          >
-            <svg viewBox="0 0 24 24" fill="none" aria-hidden className="size-5">
-              <path
-                d="M6 6l12 12M18 6 6 18"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-              />
-            </svg>
-          </button>
+          {!compact && (
+            <button
+              type="button"
+              aria-label="닫기"
+              onClick={onClose}
+              className="absolute top-6 right-4 p-1"
+            >
+              <svg viewBox="0 0 24 24" fill="none" aria-hidden className="size-5">
+                <path
+                  d="M6 6l12 12M18 6 6 18"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                />
+              </svg>
+            </button>
+          )}
         </header>
 
-        <div className="overflow-y-auto px-5 pb-[calc(env(safe-area-inset-bottom)+20px)]">
+        <div
+          className={cn(
+            "overflow-y-auto pb-[calc(env(safe-area-inset-bottom)+20px)]",
+            !compact && "px-5",
+          )}
+        >
           {children}
         </div>
       </section>

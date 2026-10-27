@@ -1,6 +1,17 @@
 export type BudgetStatus = "good" | "warning" | "danger";
 
-export type CategoryId = "food" | "household" | "cafe" | "study" | "hobby";
+export const CATEGORY_IDS = [
+  "food",
+  "household",
+  "cafe",
+  "study",
+  "hobby",
+  "fashion",
+  "beauty",
+  "etc",
+] as const;
+
+export type CategoryId = (typeof CATEGORY_IDS)[number];
 
 export type HomeSummary = {
   nickname: string;

@@ -32,7 +32,10 @@ export const signupSchema = z.object({
   phoneNumber,
 });
 
-export const findEmailSchema = z.object({ phoneNumber });
+export const findEmailSchema = z.object({
+  name: z.string().trim().min(1, "이름을 입력해 주세요."),
+  phoneNumber,
+});
 
 export const findPasswordSchema = z.object({
   email: z.string().min(1, "이메일을 입력해 주세요.").pipe(email),

@@ -16,6 +16,7 @@ import { AlertDialog } from "../../_components/alert-dialog";
 import { AuthHeader } from "../../_components/auth-header";
 import { PhoneField } from "../../_components/phone-field";
 import { PrimaryButton } from "../../_components/primary-button";
+import { TextField } from "../../_components/text-field";
 
 export function FindEmailForm() {
   const router = useRouter();
@@ -27,7 +28,7 @@ export function FindEmailForm() {
     formState: { errors },
   } = useForm<FindEmailFormValues>({
     resolver: zodResolver(findEmailSchema),
-    defaultValues: { phoneNumber: "" },
+    defaultValues: { name: "", phoneNumber: "" },
   });
 
   const findMutation = useMutation({ mutationFn: findEmail });
@@ -55,12 +56,21 @@ export function FindEmailForm() {
         <h2 className="text-xl leading-[1.4] font-bold">
           가입 당시 입력한
           <br />
-          휴대폰 번호를 입력해주세요
+          이름과 휴대폰 번호를 입력해주세요
         </h2>
 
-        <div className="mt-[30px]">
+        <div className="mt-[30px] flex flex-col gap-[17px]">
+          <TextField
+            id="name"
+            label="이름"
+            autoComplete="name"
+            placeholder="이름 입력"
+            error={errors.name?.message}
+            {...register("name")}
+          />
           <PhoneField
             id="phoneNumber"
+            label="휴대폰 번호"
             error={errors.phoneNumber?.message}
             {...register("phoneNumber")}
           />
@@ -100,7 +110,6 @@ function FoundAccount({
 
       <div className="mt-[30px] rounded-lg bg-field px-3 py-2">
         <p className="text-sm">{account.email}</p>
-        <p className="mt-0.5 text-[10px] text-[#c4c4c4]">{formatDate(account.createdAt)}</p>
       </div>
 
       <PrimaryButton type="button" onClick={onLogin} className="mt-[17px]">
@@ -112,11 +121,4 @@ function FoundAccount({
 
 function formatPhoneNumber(value: string) {
   return value.replace(/^(\d{3})(\d{4})(\d{4})$/, "$1 $2 $3");
-}
-
-function formatDate(iso: string) {
-  const date = new Date(iso);
-  if (Number.isNaN(date.getTime())) return iso;
-  const pad = (n: number) => String(n).padStart(2, "0");
-  return `${date.getFullYear()}.${pad(date.getMonth() + 1)}.${pad(date.getDate())}`;
 }

@@ -32,7 +32,7 @@ export function FindPasswordFlow() {
   const [verificationCode, setVerificationCode] = useState("");
 
   const sendCodeMutation = useMutation({
-    mutationFn: (target: string) => sendEmailCode({ email: target, purpose: "PASSWORD_REST" }),
+    mutationFn: (target: string) => sendEmailCode({ email: target, purpose: "PASSWORD_RESET" }),
   });
 
   const sendCode = (target: string) =>
@@ -184,7 +184,7 @@ function VerifyStep({
   const [code, setCode] = useState("");
 
   const verifyMutation = useMutation({
-    mutationFn: () => verifyEmailCode({ email, purpose: "PASSWORD_REST", code }),
+    mutationFn: () => verifyEmailCode({ email, purpose: "PASSWORD_RESET", code }),
     onSuccess: () => onVerified(code),
   });
 

@@ -39,3 +39,46 @@ jobs:
 
       - name: Build
         run: pnpm build
+
+      - name: Notify Discord
+        if: always()
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          STATUS: ${{ job.status }}
+          REPO: ${{ github.repository }}
+          REF_NAME: ${{ github.head_ref || github.ref_name }}
+          ACTOR: ${{ github.actor }}
+          SHA: ${{ github.sha }}
+          COMMIT_MESSAGE: ${{ github.event.head_commit.message || github.event.pull_request.title }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          if [ -z "$DISCORD_WEBHOOK_URL" ]; then
+            echo "DISCORD_WEBHOOK_URL secret이 없어 알림을 건너뜁니다."
+            exit 0
+          fi
+
+          case "$STATUS" in
+            success)   TITLE="✅ CI 성공";  COLOR=3066993 ;;
+            cancelled) TITLE="⚪ CI 취소";  COLOR=9807270 ;;
+            *)         TITLE="❌ CI 실패";  COLOR=15158332 ;;
+          esac
+
+          jq -n \
+            --arg title "$TITLE" \
+            --argjson color "$COLOR" \
+            --arg url "$RUN_URL" \
+            --arg desc "$(echo "$COMMIT_MESSAGE" | head -n 1)" \
+            --arg repo "$REPO" \
+            --arg branch "$REF_NAME" \
+            --arg actor "$ACTOR" \
+            --arg sha "${SHA:0:7}" \
+            '{embeds: [{
+              title: $title, url: $url, color: $color, description: $desc,
+              fields: [
+                {name: "저장소", value: $repo, inline: true},
+                {name: "브랜치", value: $branch, inline: true},
+                {name: "작성자", value: $actor, inline: true},
+                {name: "커밋", value: $sha, inline: true}
+              ]
+            }]}' \
+            | curl -sSf -H "Content-Type: application/json" -d @- "$DISCORD_WEBHOOK_URL"

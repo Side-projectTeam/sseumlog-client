@@ -41,7 +41,10 @@ export function ProfileScreen() {
         {reauthToken && profile ? (
           <ProfileEditForm profile={profile} reauthToken={reauthToken} />
         ) : (
-          <div aria-hidden className="mx-auto mt-8 size-[84px] animate-pulse rounded-full bg-white" />
+          <div
+            aria-hidden
+            className="mx-auto mt-8 size-[84px] animate-pulse rounded-full bg-white"
+          />
         )}
       </div>
     </main>

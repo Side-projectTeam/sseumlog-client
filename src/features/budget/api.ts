@@ -60,21 +60,18 @@ export async function getBudget(yearMonth: string) {
 // 서버는 카테고리 예산을 목표 예산 대비 비율(정수 %)로 받는다.
 // 합이 100%를 넘지 않도록 내림한다.
 export async function saveBudget(yearMonth: string, budget: Omit<Budget, "configured">) {
-  const { data } = await apiClient.put<ApiResponse<MonthlyBudgetPlanResponse>>(
-    planUrl(yearMonth),
-    {
-      income: budget.income,
-      expectedExpense: budget.plannedExpense,
-      targetAmount: budget.targetBudget,
-      targetSavings: budget.targetSaving,
-      pledge: budget.resolution,
-      categories: CATEGORY_IDS.map((id) => ({
-        category: SERVER_CATEGORY[id],
-        calculationPercentage: budget.targetBudget
-          ? Math.floor((budget.categories[id] / budget.targetBudget) * 100)
-          : 0,
-      })),
-    },
-  );
+  const { data } = await apiClient.put<ApiResponse<MonthlyBudgetPlanResponse>>(planUrl(yearMonth), {
+    income: budget.income,
+    expectedExpense: budget.plannedExpense,
+    targetAmount: budget.targetBudget,
+    targetSavings: budget.targetSaving,
+    pledge: budget.resolution,
+    categories: CATEGORY_IDS.map((id) => ({
+      category: SERVER_CATEGORY[id],
+      calculationPercentage: budget.targetBudget
+        ? Math.floor((budget.categories[id] / budget.targetBudget) * 100)
+        : 0,
+    })),
+  });
   return toBudget(data.data);
 }

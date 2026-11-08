@@ -95,14 +95,14 @@ export function LoginForm() {
         >
           로그인
         </button>
-        {/* TODO: 카카오 로그인 API가 생기면 연결 */}
-        <button
-          type="button"
+        {/* 백엔드 OAuth로 바로 넘어가야 해서 Link(프리페치) 대신 a를 쓴다 */}
+        <a
+          href="/auth/kakao"
           className="relative flex h-[50px] items-center justify-center rounded-lg bg-kakao text-base font-semibold text-ink"
         >
           <KakaoTalkIcon className="absolute left-[22px] h-6 w-[27px] text-ink" />
           카카오로 시작하기
-        </button>
+        </a>
       </div>
     </form>
   );

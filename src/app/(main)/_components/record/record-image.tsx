@@ -21,8 +21,8 @@ export function RecordImage({ imageUrl, category, sizes, className }: Props) {
           alt=""
           fill
           sizes={sizes}
-          // 방금 고른 사진(blob: 주소)은 이미지 최적화를 거칠 수 없다.
-          unoptimized={imageUrl.startsWith("blob:")}
+          // 방금 고른 사진(blob:)과 서버 사진(호스트가 정해지지 않음)은 최적화 없이 쓴다.
+          unoptimized={!imageUrl.startsWith("/")}
           className="object-cover"
         />
       ) : CATEGORIES[category].image ? (

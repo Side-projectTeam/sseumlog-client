@@ -6,7 +6,6 @@ import { usePathname } from "next/navigation";
 import { ChartIcon, HomeIcon, UserIcon } from "@/components/icons/nav-icons";
 import { cn } from "@/lib/cn";
 
-// TODO: /spending, /my 는 시안이 나올 때까지 준비 중 화면
 const tabs = [
   { href: "/", label: "홈", Icon: HomeIcon },
   { href: "/spending", label: "소비", Icon: ChartIcon },
@@ -18,11 +17,17 @@ const tabs = [
 function cornerBackground(pathname: string) {
   if (pathname === "/") return "bg-room";
   if (pathname === "/spending/report" || pathname === "/spending/budget") return "bg-field";
+  if (pathname.startsWith("/my")) return "bg-field";
   return "bg-white";
 }
 
+const HIDDEN_PATHS = new Set(["/my/verify-password"]);
+
 export function BottomNav() {
   const pathname = usePathname();
+
+  // 비밀번호 확인 화면은 시안에 하단 탭이 없다.
+  if (HIDDEN_PATHS.has(pathname)) return null;
 
   return (
     <nav aria-label="주요 메뉴" className={cn("sticky bottom-0 z-10", cornerBackground(pathname))}>

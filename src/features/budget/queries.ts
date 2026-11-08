@@ -19,7 +19,7 @@ export function useBudget(yearMonth: string | undefined) {
 export function useSaveBudget(yearMonth: string) {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (budget: Budget) => saveBudget(yearMonth, budget),
+    mutationFn: (budget: Omit<Budget, "configured">) => saveBudget(yearMonth, budget),
     onSuccess: () =>
       Promise.all([
         queryClient.invalidateQueries({ queryKey: ["budget"] }),

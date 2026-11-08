@@ -14,11 +14,13 @@ import { particle } from "@/lib/korean";
 import { CompareBar } from "./compare-bar";
 import { EmotionBars } from "./emotion-bars";
 import { EmotionSummary } from "./emotion-summary";
+import { MonthPickerDialog } from "../../../_components/month-picker-dialog";
 import { TriangleButton } from "../../../_components/triangle-button";
 
 export function ReportScreen() {
   const currentMonth = useCurrentMonth();
   const [monthsAgo, setMonthsAgo] = useState(0);
+  const [pickerOpen, setPickerOpen] = useState(false);
   const selected = currentMonth === null ? null : toYearMonth(currentMonth - monthsAgo);
   const lastMonth = currentMonth === null ? null : toYearMonth(currentMonth - monthsAgo - 1);
 
@@ -45,9 +47,17 @@ export function ReportScreen() {
             disabled={!selected}
             onClick={() => setMonthsAgo((n) => n + 1)}
           />
-          <p aria-live="polite" className="min-w-[44px] text-center text-lg font-bold">
+          <button
+            type="button"
+            aria-live="polite"
+            aria-haspopup="dialog"
+            aria-label={selected ? `${selected.year}년 ${selected.month}월, 월 선택` : "월 선택"}
+            disabled={!selected}
+            onClick={() => setPickerOpen(true)}
+            className="min-w-[44px] text-center text-lg font-bold"
+          >
             {selected ? `${selected.month}월` : ""}
-          </p>
+          </button>
           <TriangleButton
             direction="next"
             disabled={monthsAgo === 0}
@@ -77,6 +87,14 @@ export function ReportScreen() {
           <div aria-hidden className="h-[300px] animate-pulse rounded-xl bg-white" />
         )}
       </div>
+      {pickerOpen && currentMonth !== null && (
+        <MonthPickerDialog
+          value={currentMonth - monthsAgo}
+          max={currentMonth}
+          onApply={(monthIndex) => setMonthsAgo(currentMonth - monthIndex)}
+          onClose={() => setPickerOpen(false)}
+        />
+      )}
     </main>
   );
 }

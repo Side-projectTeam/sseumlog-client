@@ -2,9 +2,10 @@ import type { BudgetStatus, HomeSummary } from "@/features/home/types";
 import { cn } from "@/lib/cn";
 
 const statusBadge: Record<BudgetStatus, { label: string; className: string }> = {
-  good: { label: "적정", className: "bg-[#d8fbcf] text-[#2f7a4f]" },
-  warning: { label: "주의", className: "bg-[#fff1c2] text-[#a86b00]" },
-  danger: { label: "위험", className: "bg-[#ffe0e0] text-danger" },
+  SURPLUS: { label: "여유", className: "bg-[#dcebff] text-[#2b62c4]" },
+  APPROPRIATE: { label: "적정", className: "bg-[#d8fbcf] text-[#2f7a4f]" },
+  CAUTION: { label: "주의", className: "bg-[#fff1c2] text-[#a86b00]" },
+  EXCEEDED: { label: "초과", className: "bg-[#ffe0e0] text-danger" },
 };
 
 type Props = {

@@ -2,7 +2,7 @@ import { apiClient, type ApiResponse } from "@/lib/api/client";
 
 import type { FindEmailForm, LoginForm, SignupForm } from "./schemas";
 
-export type EmailAuthPurpose = "SIGNUP" | "PASSWORD_RESET";
+export type EmailAuthPurpose = "SIGNUP" | "PASSWORD_RESET" | "PROFILE_EMAIL_LINK";
 
 export type SignupResponse = {
   id: number;
@@ -63,4 +63,20 @@ export async function resetPassword(body: {
 }) {
   const { data } = await apiClient.post<ApiResponse<null>>("/api/users/password/reset", body);
   return data;
+}
+
+// 카카오 로그인 후 백엔드가 프론트로 돌려준 일회용 code를 로그인 토큰으로 바꾼다.
+// 응답은 Map<String, String>이라 키를 하나씩 꺼낸다.
+export async function exchangeKakaoCode(code: string) {
+  const { data } = await apiClient.post<ApiResponse<Record<string, string>>>(
+    "/api/auth/kakao/exchange",
+    { code },
+  );
+  const result = data.data;
+  if (!result.accessToken) throw new Error("카카오 로그인에 실패했어요. 다시 시도해 주세요.");
+  return {
+    userId: Number(result.userId ?? 0),
+    email: result.email ?? "",
+    accessToken: result.accessToken,
+  };
 }

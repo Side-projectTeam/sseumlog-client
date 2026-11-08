@@ -1,256 +1,83 @@
 import { CATEGORIES } from "@/features/home/categories";
 import type { CategoryId } from "@/features/home/types";
+import { apiClient, type ApiResponse } from "@/lib/api/client";
+import {
+  fromServerCategory,
+  fromServerEmotion,
+  fromServerSatisfaction,
+  SERVER_CATEGORY,
+  SERVER_EMOTION,
+  SERVER_SATISFACTION,
+  splitYearMonth,
+  type ServerCategory,
+  type ServerEmotion,
+  type ServerSatisfaction,
+} from "@/lib/api/enums";
+
+import { useLikeStore } from "./likes";
 
 import type { SpendingRecord, SpendingRecordInput } from "./types";
 
-// TODO: 서버에 소비 기록 API가 추가되면 연결.
-// 지금은 메모리에 들고 있어서 새로고침하면 처음 상태로 돌아간다.
-let records: SpendingRecord[] = [
-  {
-    id: 1,
-    imageUrl: null,
-    price: 16_000,
-    purchasedAt: "2026-10-07",
-    category: "study",
-    satisfaction: "VERY_SATISFIED",
-    emotion: "JOY",
-    memo: "이번 달 가장 잘 산 책! 내용이 너무 좋다",
-    liked: false,
-    place: "청주시 강서동 영풍문고",
-  },
-  {
-    id: 2,
-    imageUrl: null,
-    price: 3_000,
-    purchasedAt: "2026-10-12",
-    category: "cafe",
-    satisfaction: "SATISFIED",
-    emotion: "JOY",
-    memo: "",
-    liked: false,
-    place: "청주시 강서동 스기",
-  },
-  {
-    id: 3,
-    imageUrl: null,
-    price: 8_000,
-    purchasedAt: "2026-10-12",
-    category: "household",
-    satisfaction: "NORMAL",
-    emotion: "COMFORT",
-    memo: "",
-    liked: false,
-    place: "청주시 강서동 판도",
-  },
-  {
-    id: 4,
-    imageUrl: null,
-    price: 12_000,
-    purchasedAt: "2026-10-11",
-    category: "food",
-    satisfaction: "VERY_SATISFIED",
-    emotion: "JOY",
-    memo: "",
-    liked: false,
-    place: "평택시 동기비 쭈꾸미",
-  },
-  {
-    id: 5,
-    imageUrl: null,
-    price: 16_000,
-    purchasedAt: "2026-10-10",
-    category: "food",
-    satisfaction: "VERY_SATISFIED",
-    emotion: "JOY",
-    memo: "",
-    liked: false,
-    place: "청주시 제주삼겹",
-  },
-  {
-    id: 6,
-    imageUrl: null,
-    price: 12_000,
-    purchasedAt: "2026-10-09",
-    category: "hobby",
-    satisfaction: "SATISFIED",
-    emotion: "EXCITED",
-    memo: "",
-    liked: false,
-    place: "서울시 정한마리",
-  },
-  {
-    id: 7,
-    imageUrl: null,
-    price: 24_000,
-    purchasedAt: "2026-10-15",
-    category: "food",
-    satisfaction: "VERY_SATISFIED",
-    emotion: "JOY",
-    memo: "",
-    liked: false,
-    place: "청주시 복대동 국밥집",
-  },
-  {
-    id: 8,
-    imageUrl: null,
-    price: 45_000,
-    purchasedAt: "2026-10-16",
-    category: "fashion",
-    satisfaction: "SATISFIED",
-    emotion: "EXCITED",
-    memo: "가을 니트 득템",
-    liked: false,
-    place: "청주시 성안길 무신사",
-  },
-  {
-    id: 9,
-    imageUrl: null,
-    price: 18_000,
-    purchasedAt: "2026-10-17",
-    category: "beauty",
-    satisfaction: "SATISFIED",
-    emotion: "PROUD",
-    memo: "",
-    liked: false,
-    place: "청주시 올리브영",
-  },
-  {
-    id: 10,
-    imageUrl: null,
-    price: 9_000,
-    purchasedAt: "2026-10-18",
-    category: "food",
-    satisfaction: "VERY_SATISFIED",
-    emotion: "JOY",
-    memo: "",
-    liked: false,
-    place: "청주시 분식집",
-  },
-  {
-    id: 11,
-    imageUrl: null,
-    price: 32_000,
-    purchasedAt: "2026-10-19",
-    category: "household",
-    satisfaction: "DISAPPOINTED",
-    emotion: "REGRET",
-    memo: "생각보다 쓸 일이 없었다",
-    liked: false,
-    place: "청주시 다이소",
-  },
-  {
-    id: 12,
-    imageUrl: null,
-    price: 6_500,
-    purchasedAt: "2026-10-20",
-    category: "cafe",
-    satisfaction: "NORMAL",
-    emotion: "COMFORT",
-    memo: "",
-    liked: false,
-    place: "청주시 스타벅스",
-  },
-  {
-    id: 13,
-    imageUrl: null,
-    price: 15_000,
-    purchasedAt: "2026-10-21",
-    category: "etc",
-    satisfaction: "NORMAL",
-    emotion: "BURDEN",
-    memo: "경조사 선물",
-    liked: false,
-    place: "청주시 편의점",
-  },
-  {
-    id: 14,
-    imageUrl: null,
-    price: 21_000,
-    purchasedAt: "2026-10-22",
-    category: "food",
-    satisfaction: "SATISFIED",
-    emotion: "JOY",
-    memo: "",
-    liked: false,
-    place: "청주시 쌀국수",
-  },
-  {
-    id: 15,
-    imageUrl: null,
-    price: 30_000,
-    purchasedAt: "2026-09-05",
-    category: "food",
-    satisfaction: "SATISFIED",
-    emotion: "JOY",
-    memo: "",
-    liked: false,
-    place: "청주시 고깃집",
-  },
-  {
-    id: 16,
-    imageUrl: null,
-    price: 12_000,
-    purchasedAt: "2026-09-08",
-    category: "food",
-    satisfaction: "NORMAL",
-    emotion: "COMFORT",
-    memo: "",
-    liked: false,
-    place: "청주시 김밥천국",
-  },
-  {
-    id: 17,
-    imageUrl: null,
-    price: 8_000,
-    purchasedAt: "2026-09-12",
-    category: "cafe",
-    satisfaction: "SATISFIED",
-    emotion: "JOY",
-    memo: "",
-    liked: false,
-    place: "청주시 메가커피",
-  },
-  {
-    id: 18,
-    imageUrl: null,
-    price: 40_000,
-    purchasedAt: "2026-09-15",
-    category: "fashion",
-    satisfaction: "DISAPPOINTED",
-    emotion: "REGRET",
-    memo: "",
-    liked: false,
-    place: "청주시 지오다노",
-  },
-  {
-    id: 19,
-    imageUrl: null,
-    price: 14_000,
-    purchasedAt: "2026-09-20",
-    category: "study",
-    satisfaction: "SATISFIED",
-    emotion: "PROUD",
-    memo: "",
-    liked: false,
-    place: "청주시 교보문고",
-  },
-  {
-    id: 20,
-    imageUrl: null,
-    price: 25_000,
-    purchasedAt: "2026-09-25",
-    category: "household",
-    satisfaction: "NORMAL",
-    emotion: "BURDEN",
-    memo: "",
-    liked: false,
-    place: "청주시 이마트",
-  },
-];
+type ExpenseResponse = {
+  id: number;
+  imageUrl: string | null;
+  price: number;
+  /** ISO date-time */
+  purchasedAt: string;
+  category: ServerCategory;
+  satisfaction: ServerSatisfaction;
+  emotion: ServerEmotion;
+  memo: string | null;
+  merchant: string | null;
+};
 
-let nextId = records.length + 1;
+type ExpenseRequest = {
+  price: number;
+  purchasedAt: string;
+  category: ServerCategory;
+  satisfaction: ServerSatisfaction;
+  emotion: ServerEmotion;
+  memo: string;
+  merchant: string;
+};
 
-const delay = () => new Promise((resolve) => setTimeout(resolve, 200));
+function toRecord(expense: ExpenseResponse): SpendingRecord {
+  return {
+    id: expense.id,
+    imageUrl: expense.imageUrl || null,
+    price: expense.price,
+    purchasedAt: expense.purchasedAt.slice(0, 10),
+    category: fromServerCategory[expense.category],
+    satisfaction: fromServerSatisfaction[expense.satisfaction],
+    emotion: fromServerEmotion[expense.emotion],
+    memo: expense.memo ?? "",
+    place: expense.merchant ?? "",
+    liked: useLikeStore.getState().likedIds.includes(expense.id),
+  };
+}
+
+// 소비 등록·수정은 multipart. request는 JSON 파트, file은 새로 고른 사진일 때만 보낸다.
+async function toFormData(input: SpendingRecordInput) {
+  const request: ExpenseRequest = {
+    price: input.price,
+    purchasedAt: `${input.purchasedAt}T00:00:00`,
+    category: SERVER_CATEGORY[input.category],
+    satisfaction: SERVER_SATISFACTION[input.satisfaction],
+    emotion: SERVER_EMOTION[input.emotion],
+    memo: input.memo,
+    merchant: input.place,
+  };
+  const form = new FormData();
+  form.append("request", new Blob([JSON.stringify(request)], { type: "application/json" }));
+  // 방금 고른 사진은 blob: 주소로 들고 있다가 여기서 파일로 바꾼다.
+  if (input.imageUrl?.startsWith("blob:")) {
+    const blob = await fetch(input.imageUrl).then((res) => res.blob());
+    form.append("file", blob, `image.${blob.type.split("/")[1] || "jpg"}`);
+  }
+  return form;
+}
+
+const multipart = { headers: { "Content-Type": "multipart/form-data" } };
 
 export type RecordFilter = {
   category?: CategoryId;
@@ -259,47 +86,50 @@ export type RecordFilter = {
 };
 
 export async function getRecords({ category, yearMonth }: RecordFilter = {}) {
-  await delay();
-  return records
+  const { data } = await apiClient.get<ApiResponse<ExpenseResponse[]>>("/api/expenses", {
+    params: yearMonth ? splitYearMonth(yearMonth) : undefined,
+  });
+  return data.data
+    .map(toRecord)
     .filter((r) => !category || r.category === category)
-    .filter((r) => !yearMonth || r.purchasedAt.startsWith(yearMonth))
     .toSorted((a, b) => b.purchasedAt.localeCompare(a.purchasedAt) || b.id - a.id);
 }
 
 export async function getRecord(id: number) {
-  await delay();
-  const record = records.find((r) => r.id === id);
-  if (!record) throw new Error("소비 기록을 찾을 수 없어요.");
-  return record;
+  const { data } = await apiClient.get<ApiResponse<ExpenseResponse>>(`/api/expenses/${id}`);
+  return toRecord(data.data);
 }
 
 export async function createRecord(input: SpendingRecordInput) {
-  await delay();
-  const record: SpendingRecord = { ...input, id: nextId++, liked: false };
-  records = [...records, record];
-  return record;
+  const { data } = await apiClient.post<ApiResponse<ExpenseResponse>>(
+    "/api/expenses",
+    await toFormData(input),
+    multipart,
+  );
+  return toRecord(data.data);
 }
 
 export async function updateRecord(id: number, input: SpendingRecordInput) {
-  await delay();
-  const record = await getRecord(id);
-  const updated = { ...record, ...input };
-  records = records.map((r) => (r.id === id ? updated : r));
-  return updated;
+  const { data } = await apiClient.put<ApiResponse<ExpenseResponse>>(
+    `/api/expenses/${id}`,
+    await toFormData(input),
+    multipart,
+  );
+  return toRecord(data.data);
 }
 
 export async function setRecordLiked(id: number, liked: boolean) {
-  await delay();
-  records = records.map((r) => (r.id === id ? { ...r, liked } : r));
+  useLikeStore.getState().setLiked(id, liked);
 }
 
 export async function deleteRecord(id: number) {
-  await delay();
-  records = records.filter((r) => r.id !== id);
+  await apiClient.delete(`/api/expenses/${id}`);
+  useLikeStore.getState().setLiked(id, false);
 }
 
 /** 기록이 하나라도 있는 카테고리 (선반에 올라갈 순서대로) */
 export async function getRecordCategories() {
+  const records = await getRecords();
   return (Object.keys(CATEGORIES) as CategoryId[]).filter((id) =>
     records.some((r) => r.category === id),
   );

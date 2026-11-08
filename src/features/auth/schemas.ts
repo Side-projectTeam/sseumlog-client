@@ -1,9 +1,9 @@
 import { z } from "zod";
 
 // 서버 SignupRequest 검증 규칙과 동일하게 맞춘다.
-const email = z.email("올바른 이메일 형식이 아니에요.");
+export const emailSchema = z.email("올바른 이메일 형식이 아니에요.");
 
-const password = z
+export const passwordSchema = z
   .string()
   .min(8, "비밀번호는 8~16자로 입력해 주세요.")
   .max(16, "비밀번호는 8~16자로 입력해 주세요.")
@@ -12,38 +12,38 @@ const password = z
     "영문, 숫자, 특수문자(!@#$%^&*)를 모두 포함해 주세요.",
   );
 
-const phoneNumber = z
+export const phoneNumberSchema = z
   .string()
   .regex(/^010[0-9]{8}$/, "010으로 시작하는 숫자 11자리를 입력해 주세요.");
 
 export const loginSchema = z.object({
-  email: z.string().min(1, "이메일을 입력해 주세요.").pipe(email),
+  email: z.string().min(1, "이메일을 입력해 주세요.").pipe(emailSchema),
   password: z.string().min(1, "비밀번호를 입력해 주세요."),
 });
 
 export const signupSchema = z.object({
-  email: z.string().min(1, "이메일을 입력해 주세요.").pipe(email),
-  password,
+  email: z.string().min(1, "이메일을 입력해 주세요.").pipe(emailSchema),
+  password: passwordSchema,
   name: z
     .string()
     .min(2, "이름은 2~10자로 입력해 주세요.")
     .max(10, "이름은 2~10자로 입력해 주세요.")
     .regex(/^[가-힣a-zA-Z ]+$/, "이름은 한글 또는 영문만 입력할 수 있어요."),
-  phoneNumber,
+  phoneNumber: phoneNumberSchema,
 });
 
 export const findEmailSchema = z.object({
   name: z.string().trim().min(1, "이름을 입력해 주세요."),
-  phoneNumber,
+  phoneNumber: phoneNumberSchema,
 });
 
 export const findPasswordSchema = z.object({
-  email: z.string().min(1, "이메일을 입력해 주세요.").pipe(email),
+  email: z.string().min(1, "이메일을 입력해 주세요.").pipe(emailSchema),
 });
 
 export const resetPasswordSchema = z
   .object({
-    newPassword: password,
+    newPassword: passwordSchema,
     newPasswordConfirm: z.string().min(1, "비밀번호를 한 번 더 입력해 주세요."),
   })
   .refine((v) => v.newPassword === v.newPasswordConfirm, {

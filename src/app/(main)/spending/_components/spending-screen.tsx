@@ -10,6 +10,7 @@ import { RECORD_SORTS, sortRecords, type RecordSort } from "@/features/spending/
 import { toYearMonth, useCurrentMonth } from "@/hooks/use-current-month";
 
 import { SortSheet } from "./sort-sheet";
+import { MonthPickerDialog } from "../../_components/month-picker-dialog";
 import { RecordCard } from "../../_components/record/record-card";
 import { RecordSheets, type SheetRoute } from "../../_components/record/record-sheets";
 import { TriangleButton } from "../../_components/triangle-button";
@@ -17,6 +18,7 @@ import { TriangleButton } from "../../_components/triangle-button";
 export function SpendingScreen() {
   const currentMonth = useCurrentMonth();
   const [monthsAgo, setMonthsAgo] = useState(0);
+  const [pickerOpen, setPickerOpen] = useState(false);
   const [sort, setSort] = useState<RecordSort>("recent");
   const [sortOpen, setSortOpen] = useState(false);
   const [sheets, setSheets] = useState<SheetRoute[]>([]);
@@ -57,9 +59,17 @@ export function SpendingScreen() {
               disabled={!selected}
               onClick={() => setMonthsAgo((n) => n + 1)}
             />
-            <p aria-live="polite" className="min-w-[44px] text-center text-xl font-bold">
+            <button
+              type="button"
+              aria-live="polite"
+              aria-haspopup="dialog"
+              aria-label={selected ? `${selected.year}년 ${selected.month}월, 월 선택` : "월 선택"}
+              disabled={!selected}
+              onClick={() => setPickerOpen(true)}
+              className="min-w-[44px] text-center text-xl font-bold"
+            >
               {selected ? `${selected.month}월` : ""}
-            </p>
+            </button>
             <TriangleButton
               direction="next"
               disabled={monthsAgo === 0}
@@ -151,6 +161,14 @@ export function SpendingScreen() {
       {sortOpen && <SortSheet value={sort} onChange={setSort} onClose={() => setSortOpen(false)} />}
       {/* 목록 시트는 쓰지 않아서 닉네임은 비워 둔다 */}
       <RecordSheets nickname="" stack={sheets} onChange={setSheets} />
+      {pickerOpen && currentMonth !== null && (
+        <MonthPickerDialog
+          value={currentMonth - monthsAgo}
+          max={currentMonth}
+          onApply={(monthIndex) => setMonthsAgo(currentMonth - monthIndex)}
+          onClose={() => setPickerOpen(false)}
+        />
+      )}
     </main>
   );
 }

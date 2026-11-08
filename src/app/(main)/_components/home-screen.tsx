@@ -10,12 +10,14 @@ import { toYearMonth, useCurrentMonth } from "@/hooks/use-current-month";
 
 import { BudgetCard } from "./budget-card";
 import { CategoryShelves } from "./category-shelves";
+import { MonthPickerDialog } from "./month-picker-dialog";
 import { RecordSheets, type SheetRoute } from "./record/record-sheets";
 
 export function HomeScreen() {
   const currentMonth = useCurrentMonth();
   // 이번 달 기준 몇 달 전을 보고 있는지 (0 = 이번 달)
   const [monthsAgo, setMonthsAgo] = useState(0);
+  const [pickerOpen, setPickerOpen] = useState(false);
   const [sheets, setSheets] = useState<SheetRoute[]>([]);
 
   const selected = currentMonth === null ? null : toYearMonth(currentMonth - monthsAgo);
@@ -56,9 +58,17 @@ export function HomeScreen() {
             onClick={() => setMonthsAgo((n) => n + 1)}
             disabled={!selected}
           />
-          <p aria-live="polite" className="min-w-[46px] text-center text-lg font-bold">
+          <button
+            type="button"
+            aria-live="polite"
+            aria-haspopup="dialog"
+            aria-label={selected ? `${selected.year}년 ${selected.month}월, 월 선택` : "월 선택"}
+            disabled={!selected}
+            onClick={() => setPickerOpen(true)}
+            className="min-w-[46px] text-center text-lg font-bold"
+          >
             {selected ? `${selected.month}월` : ""}
-          </p>
+          </button>
           <MonthButton
             direction="next"
             onClick={() => setMonthsAgo((n) => n - 1)}
@@ -78,6 +88,14 @@ export function HomeScreen() {
       />
 
       <RecordSheets nickname={data?.nickname ?? ""} stack={sheets} onChange={setSheets} />
+      {pickerOpen && currentMonth !== null && (
+        <MonthPickerDialog
+          value={currentMonth - monthsAgo}
+          max={currentMonth}
+          onApply={(monthIndex) => setMonthsAgo(currentMonth - monthIndex)}
+          onClose={() => setPickerOpen(false)}
+        />
+      )}
     </main>
   );
 }
